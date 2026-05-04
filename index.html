@@ -39,7 +39,7 @@
             height: 100vh;
             background: var(--cream);
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
             box-shadow: 0 10px 30px rgba(74, 55, 40, 0.1);
         }
 
@@ -129,7 +129,7 @@
             cursor: pointer;
         }
 
-        .action-btn i { font-size: 1.5rem; display: block; margin-bottom: 10px; }
+        .action-btn .icon { font-size: 1.5rem; display: block; margin-bottom: 10px; }
 
         .history-section { margin-top: 30px; }
         .history-title { font-weight: 600; margin-bottom: 15px; font-size: 1rem; }
@@ -142,6 +142,9 @@
         }
 
         .hidden { display: none !important; }
+
+        /* UI Scanner & Modal */
+        #reader { background: #000; }
     </style>
 </head>
 <body>
@@ -179,11 +182,13 @@
         </div>
 
         <div class="action-grid">
-            <div class="action-btn" onclick="alert('Buka QR Scanner...')">
-                <span>📲</span><br>Bayar
+            <div class="action-btn" onclick="openScanner()">
+                <span class="icon">📲</span>
+                <span>Bayar</span>
             </div>
-            <div class="action-btn" onclick="alert('Tunjuk QR Anda...')">
-                <span>📥</span><br>Terima
+            <div class="action-btn" onclick="showReceiveQR()">
+                <span class="icon">📥</span>
+                <span>Terima</span>
             </div>
         </div>
 
@@ -202,11 +207,31 @@
         </div>
     </div>
 
+    <div id="scanner-container" class="hidden" style="padding: 20px; text-align: center;">
+        <h2 style="margin-bottom: 20px;">Imbas QR Staf</h2>
+        <div id="reader" style="width: 100%; border-radius: 20px; overflow: hidden;"></div>
+        <button class="btn-secondary" onclick="closeScanner()">Batal</button>
+    </div>
+
+    <div id="receive-modal" class="hidden" style="padding: 20px; text-align: center;">
+        <h2>Kod QR Anda</h2>
+        <p style="font-size: 0.8rem; margin: 15px 0;">Minta rakan imbas kod ini untuk hantar MYR</p>
+        <div id="qrcode-area" style="background: white; padding: 20px; display: inline-block; border-radius: 15px;">
+            <div style="width: 200px; height: 200px; background: #eee; display: flex; align-items: center; justify-content: center;">
+                QR Generates Here
+            </div>
+        </div>
+        <br>
+        <button class="btn-secondary" onclick="closeReceive()">Tutup</button>
+    </div>
+
 </div>
 
+<script src="https://unpkg.com/html5-qrcode"></script>
+
 <script>
-    // Konfigurasi Asas
-    const LUM_TO_MYR_RATE = 1.0; // 1 LUM = RM 1.00
+    const LUM_TO_MYR_RATE = 1.0; 
+    let html5QrCode;
 
     function attemptLogin() {
         const email = document.getElementById('email').value;
@@ -215,6 +240,7 @@
         if(email && walletId) {
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userEmail', email);
+            localStorage.setItem('walletAddress', walletId);
             showDashboard();
         } else {
             alert('Sila masukkan butiran lengkap.');
@@ -223,9 +249,10 @@
 
     function showDashboard() {
         document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('scanner-container').classList.add('hidden');
+        document.getElementById('receive-modal').classList.add('hidden');
         document.getElementById('dashboard-screen').style.display = 'block';
         document.getElementById('user-display').innerText = `Hi, ${localStorage.getItem('userEmail')}`;
-        
         updateBalance(85.50);
     }
 
@@ -235,31 +262,67 @@
         document.getElementById('lum-balance').innerText = `${lumAmount.toFixed(2)} LUM`;
     }
 
+    /* Fungsi Scanner */
+    function openScanner() {
+        document.getElementById('dashboard-screen').style.display = 'none';
+        document.getElementById('scanner-container').classList.remove('hidden');
+        
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            (decodedText) => {
+                alert("QR Berjaya Diimbas: " + decodedText);
+                closeScanner();
+            },
+            (errorMessage) => { /* Ignore errors */ }
+        ).catch(err => alert("Kamera Gagal: " + err));
+    }
+
+    function closeScanner() {
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                document.getElementById('scanner-container').classList.add('hidden');
+                document.getElementById('dashboard-screen').style.display = 'block';
+            });
+        } else {
+            document.getElementById('scanner-container').classList.add('hidden');
+            document.getElementById('dashboard-screen').style.display = 'block';
+        }
+    }
+
+    /* Fungsi Terima QR */
+    function showReceiveQR() {
+        document.getElementById('dashboard-screen').style.display = 'none';
+        document.getElementById('receive-modal').classList.remove('hidden');
+        // Nota: Di sini anda boleh masukkan logik generator QR sebenar
+        console.log("Menjana QR untuk: " + localStorage.getItem('walletAddress'));
+    }
+
+    function closeReceive() {
+        document.getElementById('receive-modal').classList.add('hidden');
+        document.getElementById('dashboard-screen').style.display = 'block';
+    }
+
     function logout() {
         localStorage.clear();
         location.reload();
     }
 
     function requestAccount() {
-        const email = prompt("Masukkan e-mel organisasi anda untuk pendaftaran:");
-        if(email) {
-            alert("Permohonan dihantar kepada Admin. Sila tunggu maklum balas melalui e-mel.");
-        }
+        const email = prompt("Masukkan e-mel organisasi anda:");
+        if(email) alert("Permohonan dihantar kepada Admin.");
     }
 
-    // Semak status log masuk semasa muat semula
     window.onload = () => {
         if(localStorage.getItem('isLoggedIn') === 'true') {
             showDashboard();
         }
     }
 
-    // Kod Pendaftaran Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('Service Worker didaftarkan!', reg))
-                .catch(err => console.log('Pendaftaran Service Worker gagal:', err));
+            navigator.serviceWorker.register('/sw.js').catch(err => console.log(err));
         });
     }
 </script>
