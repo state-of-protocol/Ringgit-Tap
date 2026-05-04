@@ -1,0 +1,25 @@
+{
+  "short_name": "CoffeePay",
+  "name": "Coffee-Pay: Ringgit-Tap Wallet",
+  "description": "Sistem dompet organisasi berasaskan lejar LUM Network.",
+  "icons": [
+    {
+      "src": "assets/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#F5F5DC",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#4A3728",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "productivity"]
+}
