@@ -4,7 +4,7 @@
   "users": [
     {
       "name": "USER001",
-      "email": "admin@organisasi.com",
+      "email": "admin1@organisasi.com",
       "wallet_address": "lum13fgcln9k7ft2pkndjh4xhzlv3y3l8e450vnztl",
       "role": "admin",
       "status": "active"
