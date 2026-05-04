@@ -1,0 +1,37 @@
+{
+  "project": "Coffee-Pay (Ringgit-Tap)",
+  "currency": "MYR",
+  "base_token": "LUM",
+  "transactions": [
+    {
+      "id": "tx_001",
+      "timestamp": "2023-10-27T08:30:00Z",
+      "sender": "admin@organisasi.com",
+      "recipient": "ahmad@organisasi.com",
+      "description": "Initial Disbursement (Allowance)",
+      "amount_myr": 100.00,
+      "lum_hash": "0x74a...e12b",
+      "type": "credit"
+    },
+    {
+      "id": "tx_002",
+      "timestamp": "2023-10-27T10:15:00Z",
+      "sender": "ahmad@organisasi.com",
+      "recipient": "pantry_kopi@organisasi.com",
+      "description": "Pembelian Espresso (Cafe A)",
+      "amount_myr": 12.50,
+      "lum_hash": "0x85b...f33c",
+      "type": "debit"
+    },
+    {
+      "id": "tx_003",
+      "timestamp": "2023-10-27T12:00:00Z",
+      "sender": "siti@organisasi.com",
+      "recipient": "ahmad@organisasi.com",
+      "description": "Bayaran Makan Tengahari",
+      "amount_myr": 15.00,
+      "lum_hash": "0x96c...a44d",
+      "type": "credit"
+    }
+  ]
+}
