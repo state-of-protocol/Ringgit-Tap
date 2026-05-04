@@ -3,9 +3,9 @@
   "last_updated": "2023-10-27",
   "users": [
     {
-      "name": "Admin Coffee",
+      "name": "USER001",
       "email": "admin@organisasi.com",
-      "wallet_address": "lum1admin001testnetaddress",
+      "wallet_address": "lum13fgcln9k7ft2pkndjh4xhzlv3y3l8e450vnztl",
       "role": "admin",
       "status": "active"
     },
