@@ -1,0 +1,57 @@
+name: Git-as-a-Ledger-Update
+
+on:
+  repository_dispatch:
+    types: [new-transaction] # Pencetus apabila ada transaksi dari PWA
+  workflow_dispatch: # Membolehkan anda jalankan secara manual dari GitHub UI
+
+jobs:
+  update-ledger:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Wajib untuk membolehkan GitHub Action menulis ke repo
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Process Transaction Data
+        run: |
+          # Ambil data dari payload yang dihantar oleh PWA
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          SENDER="${{ github.event.client_payload.sender }}"
+          RECIPIENT="${{ github.event.client_payload.recipient }}"
+          AMOUNT="${{ github.event.client_payload.amount }}"
+          DESC="${{ github.event.client_payload.description }}"
+          TX_HASH="${{ github.event.client_payload.tx_hash }}"
+          TYPE="${{ github.event.client_payload.type }}"
+
+          # Gunakan Python atau JQ untuk masukkan data ke dalam ledger.json
+          # Di sini kita gunakan skrip ringkas untuk append data
+          python3 -c "
+          import json
+          with open('ledger.json', 'r+') as f:
+              data = json.load(f)
+              new_tx = {
+                  'id': 'tx_' + str(len(data['transactions']) + 1),
+                  'timestamp': '$TIMESTAMP',
+                  'sender': '$SENDER',
+                  'recipient': '$RECIPIENT',
+                  'description': '$DESC',
+                  'amount_myr': float('$AMOUNT'),
+                  'lum_hash': '$TX_HASH',
+                  'type': '$TYPE'
+              }
+              data['transactions'].append(new_tx)
+              f.seek(0)
+              json.dump(data, f, indent=2)
+              f.truncate()
+          "
+
+      - name: Commit and Push to Ledger
+        run: |
+          git config --global user.name "Coffee-Pay Bot"
+          git config --global user.email "bot@ringgit-tap.internal"
+          git add ledger.json
+          git commit -m "📝 LEDGER UPDATE: Transaksi RM ${{ github.event.client_payload.amount }} [Ref: $TX_HASH]"
+          git push
