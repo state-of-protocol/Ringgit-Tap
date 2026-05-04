@@ -1,0 +1,27 @@
+{
+  "organization": "Ringgit-Tap Internal",
+  "last_updated": "2023-10-27",
+  "users": [
+    {
+      "name": "Admin Coffee",
+      "email": "admin@organisasi.com",
+      "wallet_address": "lum1admin001testnetaddress",
+      "role": "admin",
+      "status": "active"
+    },
+    {
+      "name": "Ahmad Staf",
+      "email": "ahmad@organisasi.com",
+      "wallet_address": "lum1ahmad002testnetaddress",
+      "role": "user",
+      "status": "active"
+    },
+    {
+      "name": "Siti Staf",
+      "email": "siti@organisasi.com",
+      "wallet_address": "lum1siti003testnetaddress",
+      "role": "user",
+      "status": "active"
+    }
+  ]
+}
