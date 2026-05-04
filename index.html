@@ -143,7 +143,6 @@
 
         .hidden { display: none !important; }
 
-        /* UI Scanner & Modal */
         #reader { background: #000; }
     </style>
 </head>
@@ -216,13 +215,13 @@
     <div id="receive-modal" class="hidden" style="padding: 20px; text-align: center;">
         <h2>Kod QR Anda</h2>
         <p style="font-size: 0.8rem; margin: 15px 0;">Minta rakan imbas kod ini untuk hantar MYR</p>
-        <div id="qrcode-area" style="background: white; padding: 20px; display: inline-block; border-radius: 15px;">
-            <div style="width: 200px; height: 200px; background: #eee; display: flex; align-items: center; justify-content: center;">
-                QR Generates Here
-            </div>
+        
+        <div id="qrcode-area" style="background: white; padding: 20px; display: inline-block; border-radius: 15px; min-width: 200px; min-height: 200px;">
+            <p style="color: #ccc;">Menjana QR...</p>
         </div>
+        
         <br>
-        <button class="btn-secondary" onclick="closeReceive()">Tutup</button>
+        <button class="btn-secondary" onclick="closeReceive()" style="margin-top: 20px;">Tutup</button>
     </div>
 
 </div>
@@ -262,7 +261,6 @@
         document.getElementById('lum-balance').innerText = `${lumAmount.toFixed(2)} LUM`;
     }
 
-    /* Fungsi Scanner */
     function openScanner() {
         document.getElementById('dashboard-screen').style.display = 'none';
         document.getElementById('scanner-container').classList.remove('hidden');
@@ -275,7 +273,7 @@
                 alert("QR Berjaya Diimbas: " + decodedText);
                 closeScanner();
             },
-            (errorMessage) => { /* Ignore errors */ }
+            (errorMessage) => { }
         ).catch(err => alert("Kamera Gagal: " + err));
     }
 
@@ -291,11 +289,9 @@
         }
     }
 
-    /* Fungsi Terima QR */
     function showReceiveQR() {
         document.getElementById('dashboard-screen').style.display = 'none';
         document.getElementById('receive-modal').classList.remove('hidden');
-        // Nota: Di sini anda boleh masukkan logik generator QR sebenar
         console.log("Menjana QR untuk: " + localStorage.getItem('walletAddress'));
     }
 
