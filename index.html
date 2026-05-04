@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee-Pay | Ringgit-Tap</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #F5F5DC;
+            --latte: #C2B280;
+            --espresso: #4A3728;
+            --coffee-light: #E1D8C1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            color: var(--espresso);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: var(--cream);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(74, 55, 40, 0.1);
+        }
+
+        /* --- Login Screen --- */
+        #login-screen {
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        .logo { font-size: 3rem; margin-bottom: 10px; }
+        h1 { font-weight: 600; color: var(--espresso); margin-bottom: 30px; }
+
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; font-size: 0.8rem; margin-bottom: 5px; font-weight: 600; }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--coffee-light);
+            border-radius: 12px;
+            background: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--espresso);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--espresso);
+            text-decoration: underline;
+            border: none;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* --- Dashboard Screen --- */
+        #dashboard-screen {
+            display: none;
+            padding: 20px;
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .user-info { font-size: 0.9rem; font-weight: 600; }
+
+        .balance-card {
+            background-color: var(--espresso);
+            color: var(--cream);
+            padding: 30px 20px;
+            border-radius: 24px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .balance-label { font-size: 0.8rem; opacity: 0.8; margin-bottom: 5px; }
+        .balance-value { font-size: 2.5rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .loom-sub { font-size: 0.7rem; opacity: 0.6; margin-top: 5px; }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: white;
+            border: 2px solid var(--coffee-light);
+            padding: 20px;
+            border-radius: 18px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .action-btn i { font-size: 1.5rem; display: block; margin-bottom: 10px; }
+
+        .history-section { margin-top: 30px; }
+        .history-title { font-weight: 600; margin-bottom: 15px; font-size: 1rem; }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--coffee-light);
+            font-size: 0.85rem;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="logo">☕</div>
+        <h1>Coffee-Pay</h1>
+        <p style="font-size: 0.8rem; margin-bottom: 30px; opacity: 0.7;">Sila log masuk dengan identiti organisasi anda.</p>
+        
+        <div class="input-group">
+            <label>E-mel Organisasi</label>
+            <input type="email" id="email" placeholder="nama@organisasi.com">
+        </div>
+        <div class="input-group">
+            <label>Kata Laluan (Alamat Wallet LUM)</label>
+            <input type="password" id="wallet-id" placeholder="lum1...">
+        </div>
+        
+        <button class="btn-primary" onclick="attemptLogin()">Log Masuk</button>
+        <button class="btn-secondary" onclick="requestAccount()">Buka Akaun & Dapatkan Wallet</button>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-screen">
+        <div class="header">
+            <div class="user-info" id="user-display">Hi, Coffee User</div>
+            <div style="cursor:pointer" onclick="logout()">🚪</div>
+        </div>
+
+        <div class="balance-card">
+            <div class="balance-label">Baki Semasa</div>
+            <div class="balance-value" id="myr-balance">RM 0.00</div>
+            <div class="loom-sub" id="lum-balance">0.00 LUM</div>
+        </div>
+
+        <div class="action-grid">
+            <div class="action-btn" onclick="alert('Buka QR Scanner...')">
+                <span>📲</span><br>Bayar
+            </div>
+            <div class="action-btn" onclick="alert('Tunjuk QR Anda...')">
+                <span>📥</span><br>Terima
+            </div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-title">Transaksi Terkini (LUM Ledger)</div>
+            <div id="history-list">
+                <div class="history-item">
+                    <span>Bayaran Kopi - Cafe A</span>
+                    <span style="color:red">- RM 5.00</span>
+                </div>
+                <div class="history-item">
+                    <span>Tambah Nilai (Admin)</span>
+                    <span style="color:green">+ RM 50.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Konfigurasi Asas
+    const LUM_TO_MYR_RATE = 1.0; // 1 LUM = RM 1.00
+
+    function attemptLogin() {
+        const email = document.getElementById('email').value;
+        const walletId = document.getElementById('wallet-id').value;
+
+        if(email && walletId) {
+            // Simulasi semakan ke user.json
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userEmail', email);
+            showDashboard();
+        } else {
+            alert('Sila masukkan butiran lengkap.');
+        }
+    }
+
+    function showDashboard() {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('dashboard-screen').style.display = 'block';
+        document.getElementById('user-display').innerText = `Hi, ${localStorage.getItem('userEmail')}`;
+        
+        // Simulasi baki (Nanti akan ditarik dari blockchain.js)
+        updateBalance(85.50);
+    }
+
+    function updateBalance(lumAmount) {
+        const myrValue = lumAmount * LUM_TO_MYR_RATE;
+        document.getElementById('myr-balance').innerText = `RM ${myrValue.toFixed(2)}`;
+        document.getElementById('lum-balance').innerText = `${lumAmount.toFixed(2)} LUM`;
+    }
+
+    function logout() {
+        localStorage.clear();
+        location.reload();
+    }
+
+    function requestAccount() {
+        const email = prompt("Masukkan e-mel organisasi anda untuk pendaftaran:");
+        if(email) {
+            alert("Permohonan dihantar kepada Admin. Sila tunggu maklum balas melalui e-mel.");
+        }
+    }
+
+    // Check login status on load
+    window.onload = () => {
+        if(localStorage.getItem('isLoggedIn') === 'true') {
+            showDashboard();
+        }
+    }
+</script>
+
+</body>
+</html>
