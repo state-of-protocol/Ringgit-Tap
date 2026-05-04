@@ -72,6 +72,26 @@ Aplikasi melakukan penterjemahan automatik secara *real-time*:
 4. **GitHub Action** mencetuskan kemaskini `ledger.csv` untuk paparan rekod awam organisasi.
 
 ---
+/coffee-pay-pwa
+├── /assets
+│   ├── icon-192x192.png    (Ikon App)
+│   ├── icon-512x512.png    (Ikon Splash Screen)
+│   └── logo-coffee.svg     (Logo tema beige-coffee)
+├── /css
+│   └── style.css           (Gaya UI: Beige, Latte, Espresso)
+├── /js
+│   ├── app.js              (Logik utama: Login, Fetch Balance, UI)
+│   ├── blockchain.js       (Integrasi Lum Network/Web3)
+│   └── scanner.js          (Logik QR Code Scanner)
+├── .github/workflows
+│   └── ledger-update.yml   (GitHub Action untuk rekod transaksi)
+├── manifest.json           (Fail wajib PWA untuk "Add to Home Screen")
+├── service-worker.js       (Untuk fungsi offline & caching)
+├── index.html              (Laman utama/Dashboard)
+├── user.json               (Database pendaftaran e-mel & wallet)
+├── ledger.json             (Rekod sejarah transaksi organisasi)
+└── README.md               (Dokumentasi projek)
 
+---
 ### ☕ "Transparency brewed with security."
 *Aplikasi ini adalah prototaip untuk kegunaan organisasi tertutup di bawah protokol Ringgit-Tap.*
