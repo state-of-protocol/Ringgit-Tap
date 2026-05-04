@@ -228,6 +228,8 @@
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <script>
     const LUM_TO_MYR_RATE = 1.0; 
     let html5QrCode;
@@ -292,7 +294,22 @@
     function showReceiveQR() {
         document.getElementById('dashboard-screen').style.display = 'none';
         document.getElementById('receive-modal').classList.remove('hidden');
-        console.log("Menjana QR untuk: " + localStorage.getItem('walletAddress'));
+        
+        const wallet = localStorage.getItem('walletAddress');
+        const qrContainer = document.getElementById('qrcode-area');
+        
+        // Bersihkan kawasan QR sebelum menjana yang baru
+        qrContainer.innerHTML = "";
+        
+        // Jana QR menggunakan library qrcode.js
+        new QRCode(qrContainer, {
+            text: wallet,
+            width: 200,
+            height: 200,
+            colorDark : "#4A3728",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
     }
 
     function closeReceive() {
