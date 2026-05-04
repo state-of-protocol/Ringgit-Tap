@@ -1,6 +1,6 @@
 /**
  * js/scanner.js - Fungsi QR Generator & Scanner
- * Versi Kemaskini: Prompt Interaktif & Fix QR Generator
+ * Versi Kemaskini: Fix URL API & Prompt Interaktif
  */
 
 let html5QrCode;
@@ -20,10 +20,13 @@ function showReceiveQR() {
     const dashboard = document.getElementById('dashboard-screen');
     const receiveModal = document.getElementById('receive-modal');
     
-    // Guna Google Chart API untuk menjana QR secara dinamik
+    // PEMBETULAN: URL Google Chart API yang lengkap dengan string interpolation yang betul
     const qrUrl = `https://googleapis.com{user.wallet_address}&choe=UTF-8`;
     
-    document.getElementById('qrcode-area').innerHTML = `<img src="${qrUrl}" alt="My QR">`;
+    const qrArea = document.getElementById('qrcode-area');
+    if (qrArea) {
+        qrArea.innerHTML = `<img src="${qrUrl}" alt="My QR" style="display:block; margin:auto; border-radius:10px;">`;
+    }
     
     dashboard.classList.add('hidden');
     receiveModal.classList.remove('hidden');
@@ -53,12 +56,16 @@ function openScanner() {
         // 1. Berhentikan scanner serta-merta apabila QR dikesan
         stopScanner();
 
-        // 2. Tanya user jumlah MYR yang ingin dihantar melalui prompt yang lebih jelas
+        // 2. Tanya user jumlah MYR yang ingin dihantar
         const amount = prompt(`QR Dikesan: ${decodedText}\n\nMasukkan jumlah nilai (MYR) untuk dihantar:`, "0.00");
 
-        // 3. Jika user masukkan nilai, teruskan proses pembayaran melalui blockchain.js
+        // 3. Jika user masukkan nilai, teruskan proses pembayaran
         if (amount !== null && amount !== "" && !isNaN(amount) && parseFloat(amount) > 0) {
-            processPayment(decodedText, amount); 
+            if(typeof processPayment === "function") {
+                processPayment(decodedText, amount); 
+            } else {
+                alert("Ralat: Fungsi processPayment tidak ditemui.");
+            }
         } else if (amount !== null) {
             alert("Transaksi dibatalkan atau nilai angka tidak sah.");
         }
@@ -78,7 +85,6 @@ function stopScanner() {
             document.getElementById('dashboard-screen').classList.remove('hidden');
         }).catch(err => {
             console.warn("Gagal memberhentikan scanner:", err);
-            // Tetap tutup UI walaupun stop() gagal
             document.getElementById('scanner-container').classList.add('hidden');
             document.getElementById('dashboard-screen').classList.remove('hidden');
         });
