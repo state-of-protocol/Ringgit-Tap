@@ -1,14 +1,15 @@
-# ☕ Coffee-Pay: Internal Organization Wallet
+# ☕ Coffee-Pay: Internal Organization Wallet (Ringgit-Tap)
 > **PWA Dompet Digital Nilai MYR Berasaskan Lejar LUM Network**
 
 ![Theme](https://shields.io)
 ![Currency](https://shields.io)
 ![Access](https://shields.io)
+![Network](https://shields.io)
 
 ---
 
 ### 🪵 Visi Projek
-**Coffee-Pay** adalah sistem transaksi nilai dalaman yang menggabungkan kestabilan blockchain dengan kemudahan aplikasi web moden (PWA). Walaupun teknologinya menggunakan **LUM Network**, pengguna hanya akan berurusan dengan nilai **Ringgit Malaysia (MYR)** untuk memudahkan urusan harian dalam organisasi.
+**Coffee-Pay (Ringgit-Tap)** adalah sistem transaksi nilai dalaman yang menggabungkan kestabilan blockchain dengan kemudahan aplikasi web moden (PWA). Walaupun teknologinya menggunakan **LUM Network**, pengguna hanya akan berurusan dengan nilai **Ringgit Malaysia (MYR)** untuk memudahkan urusan harian dalam organisasi.
 
 ---
 
@@ -73,4 +74,4 @@ Aplikasi melakukan penterjemahan automatik secara *real-time*:
 ---
 
 ### ☕ "Transparency brewed with security."
-*Aplikasi ini adalah prototaip untuk kegunaan organisasi tertutup sahaja.*
+*Aplikasi ini adalah prototaip untuk kegunaan organisasi tertutup di bawah protokol Ringgit-Tap.*
