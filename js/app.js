@@ -1,6 +1,6 @@
 /**
  * js/app.js - Enjin Utama Coffee-Pay
- * Menguruskan Autentikasi, UI, dan Data Ledger
+ * Versi Real-Time Blockchain Sync (LUM Network)
  */
 
 // Konfigurasi Kadar Tukaran (1 LUM = RM 1.00)
@@ -21,25 +21,21 @@ async function attemptLogin() {
     const walletInput = document.getElementById('wallet-id').value.trim();
 
     if (!emailInput || !walletInput) {
-        alert("Sila masukkan e-mel dan alamat wallet (password) anda.");
+        alert("Sila masukkan e-mel dan alamat wallet anda.");
         return;
     }
 
     try {
-        // Ambil data user dari user.json (GitHub Ledger)
         const response = await fetch('user.json');
         const data = await response.json();
         
-        // Cari user yang sepadan
         const user = data.users.find(u => 
             u.email === emailInput && u.wallet_address === walletInput
         );
 
         if (user) {
-            // Simpan sesi dalam LocalStorage
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userData', JSON.stringify(user));
-            
             showDashboard(user);
         } else {
             alert("Akses Gagal: E-mel atau Alamat Wallet salah.");
@@ -57,27 +53,50 @@ function showDashboard(user) {
     loginScreen.classList.add('hidden');
     dashboardScreen.style.display = 'block';
     
-    // Kemaskini Nama User
     userDisplay.innerText = `Hi, ${user.name}`;
     
-    // Tarik Baki
+    // Tarik Baki Sebenar dari Blockchain
     fetchBalance(user.wallet_address);
     
-    // Tarik Sejarah Transaksi
+    // Tarik Sejarah Transaksi dari GitHub Ledger
     loadTransactionHistory();
 }
 
 /**
- * 3. PENGURUSAN BAKI (LUM TO MYR)
+ * 3. PENGURUSAN BAKI SEBENAR (LUM REST API)
+ * Menghubungkan PWA terus ke Ledger LUM Network via StakerHouse
  */
 async function fetchBalance(address) {
-    // Simulasi baki (Integrasi Web3/Loom.js di sini nanti)
-    const mockLumBalance = 125.50; 
+    if (!address) return;
     
-    const totalMYR = mockLumBalance * EXCHANGE_RATE;
-    
-    myrBalance.innerText = `RM ${totalMYR.toFixed(2)}`;
-    lumBalance.innerText = `${mockLumBalance.toFixed(2)} LUM`;
+    // UI Feedback semasa memuatkan data
+    myrBalance.style.opacity = "0.5";
+
+    try {
+        // API REST Real daripada StakerHouse
+        const response = await fetch(`https://stakerhouse.com{address}`);
+        const data = await response.json();
+        
+        // LUM Network menggunakan unit 'ulum' (1 LUM = 1,000,000 ulum)
+        const lumData = data.balances.find(b => b.denom === "ulum");
+        const rawBalance = lumData ? parseInt(lumData.amount) : 0;
+        
+        // Penukaran Unit
+        const realLumBalance = rawBalance / 1000000;
+        const totalMYR = realLumBalance * EXCHANGE_RATE;
+        
+        // Kemaskini UI
+        myrBalance.innerText = `RM ${totalMYR.toFixed(2)}`;
+        lumBalance.innerText = `${realLumBalance.toFixed(2)} LUM`;
+        myrBalance.style.opacity = "1";
+
+        console.log(`✅ Sync Blockchain Berjaya: ${realLumBalance} LUM`);
+
+    } catch (error) {
+        console.error("❌ Gagal menyambung ke LUM Endpoint:", error);
+        myrBalance.innerText = "Ralat Sync";
+        myrBalance.style.opacity = "1";
+    }
 }
 
 /**
@@ -89,7 +108,7 @@ async function loadTransactionHistory() {
         const data = await response.json();
         const listElement = document.getElementById('history-list');
         
-        listElement.innerHTML = ''; // Kosongkan list lama
+        listElement.innerHTML = ''; 
 
         data.transactions.forEach(tx => {
             const color = tx.type === 'credit' ? 'green' : '#A0522D';
@@ -119,17 +138,17 @@ function logout() {
 }
 
 /**
- * 6. REQUEST ACCOUNT (SISTEM ADMIN)
+ * 6. REQUEST ACCOUNT
  */
 function requestAccount() {
-    const email = prompt("Masukkan e-mel organisasi anda untuk pendaftaran akaun baru:");
+    const email = prompt("Masukkan e-mel organisasi anda:");
     if (email) {
-        alert("Permohonan telah dihantar. Admin akan menjana wallet LUM anda.");
+        alert("Permohonan dihantar. Admin akan menjana wallet LUM anda.");
     }
 }
 
 /**
- * 7. SEMAKAN SESI (ON LOAD)
+ * 7. SEMAKAN SESI & AUTO-REFRESH
  */
 window.onload = () => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -140,11 +159,20 @@ window.onload = () => {
     }
 };
 
-// Daftar Service Worker untuk fungsi PWA
+// Pantau baki setiap 30 saat secara automatik (Live Sync)
+setInterval(() => {
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+        const user = JSON.parse(userData);
+        fetchBalance(user.wallet_address);
+    }
+}, 30000); 
+
+// Daftar Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
-            .then(reg => console.log('✅ Service Worker Berdaftar!'))
-            .catch(err => console.log('❌ Pendaftaran Gagal!'));
+            .then(reg => console.log('✅ PWA Offline Ready!'))
+            .catch(err => console.log('❌ SW Registration Failed!'));
     });
 }
