@@ -60,27 +60,58 @@ function showDashboard(user) {
     // Kemaskini Nama User
     userDisplay.innerText = `Hi, ${user.name}`;
     
-    // Tarik Baki (Simulasi atau Real on-chain)
+    // Tarik Baki
     fetchBalance(user.wallet_address);
+    
+    // Tarik Sejarah Transaksi
+    loadTransactionHistory();
 }
 
 /**
  * 3. PENGURUSAN BAKI (LUM TO MYR)
  */
 async function fetchBalance(address) {
-    // Nota: Di sini anda akan masukkan integrasi Web3/Loom.js nanti.
-    // Buat masa ini, kita gunakan baki simulasi.
+    // Simulasi baki (Integrasi Web3/Loom.js di sini nanti)
     const mockLumBalance = 125.50; 
     
     const totalMYR = mockLumBalance * EXCHANGE_RATE;
     
-    // Update UI dengan animasi ringkas
     myrBalance.innerText = `RM ${totalMYR.toFixed(2)}`;
     lumBalance.innerText = `${mockLumBalance.toFixed(2)} LUM`;
 }
 
 /**
- * 4. LOG KELUAR
+ * 4. PAPARAN SEJARAH TRANSAKSI (DYNAMIC LEDGER)
+ */
+async function loadTransactionHistory() {
+    try {
+        const response = await fetch('ledger.json');
+        const data = await response.json();
+        const listElement = document.getElementById('history-list');
+        
+        listElement.innerHTML = ''; // Kosongkan list lama
+
+        data.transactions.forEach(tx => {
+            const color = tx.type === 'credit' ? 'green' : '#A0522D';
+            const sign = tx.type === 'credit' ? '+' : '-';
+            
+            listElement.innerHTML += `
+                <div class="history-item">
+                    <div class="history-info">
+                        <span class="title">${tx.description}</span>
+                        <span class="time">${new Date(tx.timestamp).toLocaleDateString()}</span>
+                    </div>
+                    <span class="amount" style="color: ${color}">${sign} RM ${tx.amount_myr.toFixed(2)}</span>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error("Error loading ledger:", error);
+    }
+}
+
+/**
+ * 5. LOG KELUAR
  */
 function logout() {
     localStorage.clear();
@@ -88,18 +119,17 @@ function logout() {
 }
 
 /**
- * 5. REQUEST ACCOUNT (SISTEM ADMIN)
+ * 6. REQUEST ACCOUNT (SISTEM ADMIN)
  */
 function requestAccount() {
     const email = prompt("Masukkan e-mel organisasi anda untuk pendaftaran akaun baru:");
     if (email) {
-        alert("Permohonan telah dihantar. Admin akan menjana wallet LUM anda dan menghantar maklumat melalui e-mel.");
-        // Anda boleh integrasikan Formspree atau API Email di sini
+        alert("Permohonan telah dihantar. Admin akan menjana wallet LUM anda.");
     }
 }
 
 /**
- * 6. SEMAKAN SESI (ON LOAD)
+ * 7. SEMAKAN SESI (ON LOAD)
  */
 window.onload = () => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -109,3 +139,12 @@ window.onload = () => {
         showDashboard(JSON.parse(userData));
     }
 };
+
+// Daftar Service Worker untuk fungsi PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+            .then(reg => console.log('✅ Service Worker Berdaftar!'))
+            .catch(err => console.log('❌ Pendaftaran Gagal!'));
+    });
+}
