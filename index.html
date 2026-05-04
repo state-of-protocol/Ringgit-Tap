@@ -213,7 +213,6 @@
         const walletId = document.getElementById('wallet-id').value;
 
         if(email && walletId) {
-            // Simulasi semakan ke user.json
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userEmail', email);
             showDashboard();
@@ -227,7 +226,6 @@
         document.getElementById('dashboard-screen').style.display = 'block';
         document.getElementById('user-display').innerText = `Hi, ${localStorage.getItem('userEmail')}`;
         
-        // Simulasi baki (Nanti akan ditarik dari blockchain.js)
         updateBalance(85.50);
     }
 
@@ -249,7 +247,7 @@
         }
     }
 
-    // Check login status on load
+    // Semak status log masuk semasa muat semula
     window.onload = () => {
         if(localStorage.getItem('isLoggedIn') === 'true') {
             showDashboard();
