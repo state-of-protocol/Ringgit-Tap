@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coffee-Pay | Ringgit-Tap</title>
+    
     <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/icon-192x192.png">
+    
+    <link rel="stylesheet" href="style.css">
     <link href="https://googleapis.com" rel="stylesheet">
+
     <style>
         :root {
             --cream: #F5F5DC;
@@ -141,7 +148,6 @@
 
 <div class="app-container">
     
-    <!-- Login Screen -->
     <div id="login-screen">
         <div class="logo">☕</div>
         <h1>Coffee-Pay</h1>
@@ -160,7 +166,6 @@
         <button class="btn-secondary" onclick="requestAccount()">Buka Akaun & Dapatkan Wallet</button>
     </div>
 
-    <!-- Dashboard Screen -->
     <div id="dashboard-screen">
         <div class="header">
             <div class="user-info" id="user-display">Hi, Coffee User</div>
